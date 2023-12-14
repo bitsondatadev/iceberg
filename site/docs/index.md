@@ -1,6 +1,8 @@
 ---
-title: "Intro to Apache Iceberg"
+template: home.html
+title: Home
 ---
+
 <!--
  - Licensed to the Apache Software Foundation (ASF) under one or more
  - contributor license agreements.  See the NOTICE file distributed with
@@ -27,30 +29,17 @@ section#intro {
 }
 
 .intro-header {
-    background: url(assets/images/intro-bg.webp) no-repeat center center;
-    background-size: cover;
+background: url(assets/images/intro-bg.webp) no-repeat center center;
+background-size: cover;
 }
 </style>
-
 
 <section id="intro">
    <div class="intro-header">
    </div>
 </section>
 
-## Apache Iceberg
 
-### The open table format for analytic datasets.
-
-* [Community](community.md)
-* [GitHub](https://github.com/apache/iceberg)
-* [Slack](https://github.com/apache/iceberg)
-
-## What is Iceberg?
-
-Iceberg is a high-performance format for huge analytic tables. Iceberg brings the reliability and simplicity of SQL tables to big data, while making it possible for engines like Spark, Trino, Flink, Presto, Hive and Impala to safely work with the same tables, at the same time.
-
-[Learn More]('https://iceberg.apache.org/getting-started')
 
 ## Expressive SQL
 
