@@ -23,7 +23,23 @@ This subproject contains the [MkDocs projects](https://www.mkdocs.org/) that def
 
 * Python >=3.9
 * pip
+* GNU sed
 
+### GNU sed on macOS
+
+Note, by default macOS does not use GNU sed, you can install it and add it to your PATH with [Homebrew](https://brew.sh/) by following these instructions:
+
+```shell
+brew install gnu-sed
+```
+
+After installation, run `brew info gnu-sed` to find the PATH you can use to configure GNU sed.
+
+Add the output PATH to your bashrc/zshrc/etc (double check that the PATH below matches that output by `brew info gnu-sed`):
+
+```shell
+export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
+```
 
 ## Usage
 
