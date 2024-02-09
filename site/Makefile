@@ -17,18 +17,23 @@
 help: # Show help for each of the Makefile recipes.
 	@grep -E '^[a-zA-Z0-9 -]+:.*#'  Makefile | sort | while read -r l; do printf "\033[1;32m$$(echo $$l | cut -f 1 -d':')\033[00m:$$(echo $$l | cut -f 2- -d'#')\n"; done
 
-.PHONY: serve
-serve: # Clean, build, and run the docs site locally.
-	dev/serve.sh
-
 .PHONY: build
 build: # Clean and build the docs site locally.
 	dev/build.sh
+
+.PHONY: clean
+clean: # Clean the local docs site.
+	dev/clean.sh
+
 
 .PHONY: deploy
 deploy: # Clean, build, and deploy the Iceberg docs site.
 	dev/deploy.sh
 
-.PHONY: clean
-clean: # Clean the local docs site.
-	dev/clean.sh
+.PHONY: release
+release: # Build latest docs, javadocs, and update site version.
+	dev/release.sh 
+
+.PHONY: serve
+serve: # Clean, build, and run the docs site locally.
+	dev/serve.sh

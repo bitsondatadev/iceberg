@@ -18,7 +18,10 @@
 
 set -e
 
+alias git_root="git rev-parse --show-toplevel"
 export REMOTE="iceberg_docs"
+export DOCS_BRANCH="docs"
+export JAVADOCS_BRANCH="javadoc"
 
 # Ensures the presence of a specified remote repository for documentation.
 # If the remote doesn't exist, it adds it using the provided URL.
@@ -28,40 +31,10 @@ create_or_update_docs_remote () {
   
   # Check if the remote exists before attempting to add it
   git config "remote.${REMOTE}.url" >/dev/null || 
-    git remote add "${REMOTE}" https://github.com/apache/iceberg.git
+    git remote add "${REMOTE}" git@github.com:bitsondatadev/iceberg.git
 
   # Fetch updates from the remote repository
   git fetch "${REMOTE}"
-}
-
-# Pulls updates from a specified branch of a remote repository.
-# Arguments:
-#   $1: Branch name to pull updates from
-pull_remote () {
-  echo " --> pull remote"
-
-  local BRANCH="$1"
-
-  # Ensure the branch argument is not empty
-  assert_not_empty "${BRANCH}"  
-
-  # Perform a pull from the specified branch of the remote repository
-  git pull "${REMOTE}" "${BRANCH}"  
-}
-
-# Pushes changes from a local branch to a specified branch of a remote repository.
-# Arguments:
-#   $1: Branch name to push changes to
-push_remote () {
-  echo " --> push remote"
-
-  local BRANCH="$1"
-
-  # Ensure the branch argument is not empty
-  assert_not_empty "${BRANCH}"  
-
-  # Push changes to the specified branch of the remote repository
-  git push "${REMOTE}" "${BRANCH}"  
 }
 
 # Installs or upgrades dependencies specified in the 'requirements.txt' file using pip.
@@ -127,49 +100,6 @@ create_latest () {
   cd -
 }
 
-# Updates version information within the mkdocs.yml file for a specified ICEBERG_VERSION.
-# Arguments:
-#   $1: ICEBERG_VERSION - The version number used for updating the mkdocs.yml file.
-update_version () {
-  echo " --> update version"
-
-  local ICEBERG_VERSION="$1"
-
-  # Ensure ICEBERG_VERSION is not empty
-  assert_not_empty "${ICEBERG_VERSION}"  
-
-  # Update version information within the mkdocs.yml file using sed commands
-  if [ "$(uname)" == "Darwin" ]
-  then
-    sed -i '' -E "s/(^site\_name:[[:space:]]+docs\/).*$/\1${ICEBERG_VERSION}/" ${ICEBERG_VERSION}/mkdocs.yml
-    sed -i '' -E "s/(^[[:space:]]*-[[:space:]]+Javadoc:.*\/javadoc\/).*$/\1${ICEBERG_VERSION}/" ${ICEBERG_VERSION}/mkdocs.yml
-  elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]
-  then
-    sed -i'' -E "s/(^site_name:[[:space:]]+docs\/)[^[:space:]]+/\1${ICEBERG_VERSION}/" "${ICEBERG_VERSION}/mkdocs.yml"
-    sed -i'' -E "s/(^[[:space:]]*-[[:space:]]+Javadoc:.*\/javadoc\/).*$/\1${ICEBERG_VERSION}/" "${ICEBERG_VERSION}/mkdocs.yml"
-  fi
-
-}
-
-# Excludes versioned documentation from search indexing by modifying .md files.
-# Arguments:
-#   $1: ICEBERG_VERSION - The version number of the documentation to exclude from search indexing.
-search_exclude_versioned_docs () {
-  echo " --> search exclude version docs"
-  local ICEBERG_VERSION="$1"
-
-  # Ensure ICEBERG_VERSION is not empty
-  assert_not_empty "${ICEBERG_VERSION}"  
-
-  cd "${ICEBERG_VERSION}/docs/"
-
-  # Modify .md files to exclude versioned documentation from search indexing
-  python3 -c "import os
-for f in filter(lambda x: x.endswith('.md'), os.listdir()): lines = open(f).readlines(); open(f, 'w').writelines(lines[:2] + ['search:\n', '  exclude: true\n'] + lines[2:]);"
-
-  cd -
-}
-
 # Sets up local worktrees for the documentation and performs operations related to different versions.
 pull_versioned_docs () {
   echo " --> pull versioned docs"
@@ -178,8 +108,8 @@ pull_versioned_docs () {
   create_or_update_docs_remote  
 
   # Add local worktrees for documentation and javadoc from the remote repository
-  git worktree add -f docs/docs "${REMOTE}/docs"
-  git worktree add -f docs/javadoc "${REMOTE}/javadoc"
+  git worktree add -f docs/docs "${REMOTE}/${DOCS_BRANCH}"
+  git worktree add -f docs/javadoc "${REMOTE}/${JAVADOC_BRANCH}"
   
   # Retrieve the latest version of documentation for processing
   local latest_version=$(get_latest_version)  
